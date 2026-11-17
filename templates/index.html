@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficSense AI - Intelligent Traffic Management System</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-traffic-light"></i>
+                </div>
+                <div class="brand-info">
+                    <h2>TrafficSense<span>AI</span></h2>
+                    <p>FAI Mini-Project</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item active">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/dashboard" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/predict" class="nav-item">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Predict & Agent</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Bengaluru Map</span>
+                </a>
+                <a href="/assistant" class="nav-item">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="/data" class="nav-item">
+                    <i class="fa-solid fa-database"></i>
+                    <span>Dataset & Report</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-indicator" id="model-status-indicator"></span>
+                        <span class="status-title" id="model-status-text">Checking System...</span>
+                    </div>
+                    <div class="status-sub" id="gemini-status-text">Gemini: Initializing</div>
+                </div>
+                <div class="academic-tag">
+                    <i class="fa-solid fa-graduation-cap"></i> Fundamentals of AI (FAI)
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span>Portal</span> <i class="fa-solid fa-angle-right"></i> <span class="active-crumb">Overview</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="academic-badge">
+                        <i class="fa-solid fa-flask"></i> Academic Prototype
+                    </div>
+                    <a href="/predict" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-bolt"></i> Launch Predictor
+                    </a>
+                </div>
+            </header>
+
+            <!-- Page Body -->
+            <div class="content-container">
+                <!-- Academic Disclaimer Banner -->
+                <div class="alert-banner alert-info">
+                    <div class="alert-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="alert-content">
+                        <strong>Educational Simulation Prototype:</strong>
+                        This project is built for the <em>Fundamentals of Artificial Intelligence (FAI)</em> curriculum.
+                        Traffic volumes and maps are synthetic academic demonstrations, not real-time surveillance or municipal signal controllers.
+                    </div>
+                </div>
+
+                <!-- Hero Section -->
+                <div class="hero-card">
+                    <div class="hero-content">
+                        <span class="pill-badge"><i class="fa-solid fa-microchip"></i> Machine Learning + Generative AI</span>
+                        <h1 class="hero-title">TrafficSense AI</h1>
+                        <p class="hero-subtitle">
+                            An intelligent traffic volume prediction, congestion classification, and automated policy recommendation platform designed for Bengaluru urban corridors.
+                        </p>
+                        <div class="hero-actions">
+                            <a href="/predict" class="btn btn-primary">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Try Live Prediction
+                            </a>
+                            <a href="/dashboard" class="btn btn-secondary">
+                                <i class="fa-solid fa-chart-pie"></i> View Analytics Dashboard
+                            </a>
+                            <a href="/map" class="btn btn-outline">
+                                <i class="fa-solid fa-location-crosshairs"></i> Open Bengaluru Map
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hero-graphic">
+                        <div class="pulse-ring"></div>
+                        <div class="graphic-card">
+                            <div class="graphic-item">
+                                <i class="fa-solid fa-car-side"></i>
+                                <div>
+                                    <span class="number" id="hero-total-records">2,000</span>
+                                    <span class="label">Synthetic Records</span>
+                                </div>
+                            </div>
+                            <div class="graphic-item">
+                                <i class="fa-solid fa-brain"></i>
+                                <div>
+                                    <span class="number">Random Forest</span>
+                                    <span class="label">Scikit-Learn ML Model</span>
+                                </div>
+                            </div>
+                            <div class="graphic-item">
+                                <i class="fa-solid fa-sparkles"></i>
+                                <div>
+                                    <span class="number">Gemini 2.5</span>
+                                    <span class="label">AI Advisory Agent</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Objective Section -->
+                <div class="section-block">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-bullseye"></i> Project Objective & Academic Scope</h2>
+                        <p>Bridging traditional Machine Learning regression with Generative AI urban mobility policy synthesis.</p>
+                    </div>
+                    <div class="grid-3">
+                        <div class="feature-card">
+                            <div class="feature-icon icon-blue"><i class="fa-solid fa-chart-simple"></i></div>
+                            <h3>Traffic Data Analytics</h3>
+                            <p>Analyzes multi-factor urban variables including temporal spikes, weather severity, and known bottleneck corridors across Bengaluru.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon icon-purple"><i class="fa-solid fa-network-wired"></i></div>
+                            <h3>ML Volume Prediction</h3>
+                            <p>Implements Scikit-Learn <code>RandomForestRegressor</code> to forecast vehicle volume per hour with full preprocessing pipelines.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon icon-emerald"><i class="fa-solid fa-traffic-light"></i></div>
+                            <h3>Congestion Classification</h3>
+                            <p>Categorizes corridor loads into Low (&lt;300), Medium (300-700), and High (&gt;700) tiers to aid municipal priority routing.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon icon-amber"><i class="fa-solid fa-map"></i></div>
+                            <h3>Interactive Bengaluru Map</h3>
+                            <p>Leaflet.js geospatial visualization rendering 8 critical junctions (Silk Board, Hebbal, KR Puram, etc.) with color-coded status pins.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon icon-rose"><i class="fa-solid fa-robot"></i></div>
+                            <h3>Gemini AI Assistant</h3>
+                            <p>Official Google Gemini SDK conversational assistant answering technical urban mobility queries with offline educational fallbacks.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon icon-cyan"><i class="fa-solid fa-shield-halved"></i></div>
+                            <h3>Autonomous Advisory Agent</h3>
+                            <p>Translates ML prediction numbers into 4 actionable policy directives: signal phasing, transit dispatch, and perimeter diversion.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How It Works Flow -->
+                <div class="section-block">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-gears"></i> How It Works: Pipeline Architecture</h2>
+                        <p>End-to-end artificial intelligence workflow from raw data ingestion to policy synthesis.</p>
+                    </div>
+                    <div class="workflow-grid">
+                        <div class="workflow-step">
+                            <div class="step-num">1</div>
+                            <div class="step-content">
+                                <h4>Synthetic Ingestion</h4>
+                                <p>Generates 2,000 parametric records with date, hour, weather, road, and speeds.</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                        <div class="workflow-step">
+                            <div class="step-num">2</div>
+                            <div class="step-content">
+                                <h4>Feature Engineering</h4>
+                                <p>One-hot encoding for categorical corridors and weather + numeric standard scaling.</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                        <div class="workflow-step">
+                            <div class="step-num">3</div>
+                            <div class="step-content">
+                                <h4>Random Forest ML</h4>
+                                <p>Ensemble regression evaluates non-linear temporal interactions and outputs vehicle volume.</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                        <div class="workflow-step">
+                            <div class="step-num">4</div>
+                            <div class="step-content">
+                                <h4>AI Advisory Agent</h4>
+                                <p>Gemini LLM interprets the result and synthesizes 4 tactical traffic mitigation measures.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Tech Stack Cards -->
+                <div class="section-block">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-layer-group"></i> Technologies Used</h2>
+                        <p>Strictly compliant with FAI technical constraints: No Node.js / React, 100% Python Flask & Vanilla Web.</p>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag"><i class="fa-brands fa-python"></i> Python 3.13</span>
+                        <span class="tech-tag"><i class="fa-solid fa-pepper-hot"></i> Flask Backend</span>
+                        <span class="tech-tag"><i class="fa-solid fa-brain"></i> Scikit-Learn</span>
+                        <span class="tech-tag"><i class="fa-solid fa-table"></i> Pandas & NumPy</span>
+                        <span class="tech-tag"><i class="fa-solid fa-sparkles"></i> Google Gemini API</span>
+                        <span class="tech-tag"><i class="fa-solid fa-chart-line"></i> Chart.js</span>
+                        <span class="tech-tag"><i class="fa-solid fa-map-location"></i> Leaflet.js</span>
+                        <span class="tech-tag"><i class="fa-brands fa-html5"></i> HTML5 / CSS3 / Vanilla JS</span>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Banner -->
+                <div class="cta-banner">
+                    <div class="cta-text">
+                        <h3>Ready to explore Bengaluru traffic predictions?</h3>
+                        <p>Test the Random Forest model with custom road, hour, and weather parameters.</p>
+                    </div>
+                    <div class="cta-btn">
+                        <a href="/predict" class="btn btn-light"><i class="fa-solid fa-arrow-trend-up"></i> Start Predicting Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <p>&copy; 2026 TrafficSense AI &bull; Fundamentals of Artificial Intelligence (FAI) Mini-Project &bull; Educational Prototype</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Analytics Dashboard - TrafficSense AI</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-traffic-light"></i>
+                </div>
+                <div class="brand-info">
+                    <h2>TrafficSense<span>AI</span></h2>
+                    <p>FAI Mini-Project</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/dashboard" class="nav-item active">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/predict" class="nav-item">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Predict & Agent</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Bengaluru Map</span>
+                </a>
+                <a href="/assistant" class="nav-item">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="/data" class="nav-item">
+                    <i class="fa-solid fa-database"></i>
+                    <span>Dataset & Report</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-indicator" id="model-status-indicator"></span>
+                        <span class="status-title" id="model-status-text">Checking System...</span>
+                    </div>
+                    <div class="status-sub" id="gemini-status-text">Gemini: Initializing</div>
+                </div>
+                <div class="academic-tag">
+                    <i class="fa-solid fa-graduation-cap"></i> Fundamentals of AI (FAI)
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span>Analytics</span> <i class="fa-solid fa-angle-right"></i> <span class="active-crumb">Traffic Dashboard</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-secondary btn-sm" id="btnRefreshDashboard">
+                        <i class="fa-solid fa-rotate"></i> Refresh Data
+                    </button>
+                    <a href="/predict" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> New Prediction
+                    </a>
+                </div>
+            </header>
+
+            <!-- Page Body -->
+            <div class="content-container">
+                <!-- Academic Disclaimer Banner -->
+                <div class="alert-banner alert-info">
+                    <div class="alert-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="alert-content">
+                        <strong>Synthetic Demonstration Data:</strong>
+                        All statistics, charts, and values are computed in real time from the 2,000 synthetic records in <code>dataset/traffic_data.csv</code>.
+                        These simulate urban traffic patterns for educational demonstration and do not reflect real-time live sensor feeds.
+                    </div>
+                </div>
+
+                <!-- Page Header Title -->
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Bengaluru Urban Traffic Analytics</h1>
+                        <p class="page-subtitle">Real-time dynamic aggregation across corridors, peak rush-hour curves, and weather distributions.</p>
+                    </div>
+                    <div class="badge badge-primary">
+                        <i class="fa-solid fa-database"></i> Active Dataset: traffic_data.csv
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon icon-blue"><i class="fa-solid fa-layer-group"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label">Total Records</span>
+                            <h3 class="kpi-value" id="kpi-total-records"><span class="loading-spinner"></span></h3>
+                            <span class="kpi-sub">Synthetic demonstration samples</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon icon-emerald"><i class="fa-solid fa-car-rear"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label">Avg Vehicle Count</span>
+                            <h3 class="kpi-value" id="kpi-avg-volume"><span class="loading-spinner"></span></h3>
+                            <span class="kpi-sub">Vehicles per hour per road</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon icon-cyan"><i class="fa-solid fa-gauge-high"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label">Average Speed</span>
+                            <h3 class="kpi-value" id="kpi-avg-speed"><span class="loading-spinner"></span></h3>
+                            <span class="kpi-sub">Kilometers per hour (km/h)</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon icon-rose"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label">Congestion Rate</span>
+                            <h3 class="kpi-value" id="kpi-congestion-pct"><span class="loading-spinner"></span></h3>
+                            <span class="kpi-sub">Medium or High traffic records</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon icon-amber"><i class="fa-solid fa-clock"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label">Peak Traffic Hour</span>
+                            <h3 class="kpi-value" id="kpi-peak-hour"><span class="loading-spinner"></span></h3>
+                            <span class="kpi-sub">Maximum citywide density</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 1: Hourly Curve & Congestion Distribution -->
+                <div class="grid-2">
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div>
+                                <h3><i class="fa-solid fa-chart-line"></i> Hourly Traffic Volume & Speed Profile</h3>
+                                <p>Capturing Bengaluru's morning (8-11 AM) and evening (5-8 PM) rush-hour curves.</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chartHourlyTraffic"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div>
+                                <h3><i class="fa-solid fa-chart-pie"></i> Congestion Level Distribution</h3>
+                                <p>Categorized via educational rules: Low (&lt;300), Medium (300-700), High (&gt;700).</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrapper doughnut-wrapper">
+                            <canvas id="chartCongestionDist"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 2: Road Volumes & Weather Impact -->
+                <div class="grid-2">
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div>
+                                <h3><i class="fa-solid fa-road"></i> Average Volume by Bengaluru Corridor</h3>
+                                <p>Comparing Silk Board, KR Puram, Hebbal, Marathahalli, and other key roads.</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chartRoadVolume"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div>
+                                <h3><i class="fa-solid fa-cloud-rain"></i> Weather Condition vs Traffic Impact</h3>
+                                <p>Analyzing vehicle count surges and average speed reductions during rainfall.</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chartWeatherImpact"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Congestion Standards Reference Block -->
+                <div class="info-card-block">
+                    <div class="info-card-title">
+                        <i class="fa-solid fa-scale-balanced"></i> Academic Demonstration Congestion Thresholds
+                    </div>
+                    <div class="threshold-pills">
+                        <div class="threshold-pill pill-low">
+                            <span class="dot"></span>
+                            <div>
+                                <strong>Low Congestion:</strong> &lt; 300 vehicles/hr
+                                <p>Free flow traffic, average corridor speeds 40-55 km/h.</p>
+                            </div>
+                        </div>
+                        <div class="threshold-pill pill-medium">
+                            <span class="dot"></span>
+                            <div>
+                                <strong>Medium Congestion:</strong> 300 - 700 vehicles/hr
+                                <p>Moderate density with minor queue delays, speeds 22-38 km/h.</p>
+                            </div>
+                        </div>
+                        <div class="threshold-pill pill-high">
+                            <span class="dot"></span>
+                            <div>
+                                <strong>High Congestion:</strong> &gt; 700 vehicles/hr
+                                <p>Heavy bumper-to-bumper queueing, speeds 8-18 km/h.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="footnote-text">* Note: These numerical thresholds are pedagogical simulation benchmarks established for this FAI mini-project and are not official standards established by the Bengaluru Traffic Police (BTP) or MoRTH.</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <p>&copy; 2026 TrafficSense AI &bull; Fundamentals of Artificial Intelligence (FAI) Mini-Project &bull; Educational Prototype</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            initDashboardCharts();
+            document.getElementById("btnRefreshDashboard")?.addEventListener("click", function() {
+                initDashboardCharts();
+            });
+        });
+    </script>
+</body>
+</html>

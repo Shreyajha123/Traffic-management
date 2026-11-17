@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Traffic Prediction & AI Agent - TrafficSense AI</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-traffic-light"></i>
+                </div>
+                <div class="brand-info">
+                    <h2>TrafficSense<span>AI</span></h2>
+                    <p>FAI Mini-Project</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/dashboard" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/predict" class="nav-item active">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Predict & Agent</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Bengaluru Map</span>
+                </a>
+                <a href="/assistant" class="nav-item">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="/data" class="nav-item">
+                    <i class="fa-solid fa-database"></i>
+                    <span>Dataset & Report</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-indicator" id="model-status-indicator"></span>
+                        <span class="status-title" id="model-status-text">Checking System...</span>
+                    </div>
+                    <div class="status-sub" id="gemini-status-text">Gemini: Initializing</div>
+                </div>
+                <div class="academic-tag">
+                    <i class="fa-solid fa-graduation-cap"></i> Fundamentals of AI (FAI)
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span>Machine Learning</span> <i class="fa-solid fa-angle-right"></i> <span class="active-crumb">Prediction & AI Agent</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="model-badge" id="top-model-badge">
+                        <i class="fa-solid fa-microchip"></i> Model: RandomForestRegressor
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Body -->
+            <div class="content-container">
+                <!-- Academic Disclaimer Banner -->
+                <div class="alert-banner alert-info">
+                    <div class="alert-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="alert-content">
+                        <strong>Educational Machine Learning Forecast:</strong>
+                        Predictions are generated using a <code>RandomForestRegressor</code> trained on synthetic Bengaluru demonstration patterns.
+                        These predictions and AI agent suggestions are academic demonstrations and do not control physical traffic signals.
+                    </div>
+                </div>
+
+                <div class="grid-form-results">
+                    <!-- LEFT COLUMN: Prediction Form -->
+                    <div class="form-panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2><i class="fa-solid fa-sliders"></i> Input Parameters</h2>
+                                <p>Select traffic variables to simulate Bengaluru corridor conditions.</p>
+                            </div>
+                        </div>
+
+                        <form id="predictionForm" class="predict-form" onsubmit="handlePredictionSubmit(event)">
+                            <!-- Road Selection -->
+                            <div class="form-group">
+                                <label for="road_name"><i class="fa-solid fa-road"></i> Corridor / Road Junction</label>
+                                <select id="road_name" name="road_name" class="form-control" required>
+                                    <option value="" disabled selected>Select a Bengaluru road...</option>
+                                    <option value="Silk Board">Silk Board Junction (Heavy Bottleneck)</option>
+                                    <option value="KR Puram">KR Puram Hanging Bridge</option>
+                                    <option value="Hebbal">Hebbal Flyover Junction</option>
+                                    <option value="Marathahalli">Marathahalli ORR Bridge</option>
+                                    <option value="Electronic City">Electronic City Elevated Toll</option>
+                                    <option value="Whitefield">Whitefield ITPL Main Road</option>
+                                    <option value="Indiranagar">Indiranagar 100ft Road</option>
+                                    <option value="MG Road">MG Road Central CBD</option>
+                                </select>
+                            </div>
+
+                            <!-- Date Selection -->
+                            <div class="form-group">
+                                <label for="pred_date"><i class="fa-solid fa-calendar-days"></i> Date</label>
+                                <input type="date" id="pred_date" name="pred_date" class="form-control" required>
+                                <div class="derived-badges">
+                                    <span class="derived-tag" id="tagDayOfWeek">Day: Pending</span>
+                                    <span class="derived-tag" id="tagIsWeekend">Type: Pending</span>
+                                </div>
+                            </div>
+
+                            <!-- Hour Selection -->
+                            <div class="form-group">
+                                <label for="pred_hour"><i class="fa-solid fa-clock"></i> Time of Day (Hour: 00 to 23)</label>
+                                <div class="hour-slider-group">
+                                    <input type="range" id="pred_hour" name="pred_hour" min="0" max="23" value="9" class="range-slider" oninput="updateHourDisplay(this.value)">
+                                    <span class="hour-bubble" id="hourDisplay">09:00 (9:00 AM)</span>
+                                </div>
+                                <div class="hour-presets">
+                                    <button type="button" class="btn-preset" onclick="setPresetHour(9)">Morning Peak (9 AM)</button>
+                                    <button type="button" class="btn-preset" onclick="setPresetHour(14)">Afternoon (2 PM)</button>
+                                    <button type="button" class="btn-preset" onclick="setPresetHour(18)">Evening Peak (6 PM)</button>
+                                    <button type="button" class="btn-preset" onclick="setPresetHour(2)">Late Night (2 AM)</button>
+                                </div>
+                            </div>
+
+                            <!-- Weather Selection -->
+                            <div class="form-group">
+                                <label for="pred_weather"><i class="fa-solid fa-cloud-sun-rain"></i> Weather Condition</label>
+                                <select id="pred_weather" name="pred_weather" class="form-control" required>
+                                    <option value="Clear" selected>☀️ Clear Skies</option>
+                                    <option value="Rainy">🌧️ Rainy (Monsoon Slowdown)</option>
+                                    <option value="Cloudy">⛅ Cloudy</option>
+                                    <option value="Foggy">🌫️ Foggy (Low Visibility)</option>
+                                </select>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-block" id="btnPredictSubmit">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Vehicle Volume
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Prediction Output & ML Gauge -->
+                    <div class="results-panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2><i class="fa-solid fa-gauge"></i> Prediction Output</h2>
+                                <p>Random Forest inference with automated congestion classification.</p>
+                            </div>
+                        </div>
+
+                        <!-- Initial Empty State -->
+                        <div id="predictionEmptyState" class="empty-state-card">
+                            <div class="empty-icon"><i class="fa-solid fa-sliders"></i></div>
+                            <h3>Awaiting Parameters</h3>
+                            <p>Select a road, time, and weather on the left and click <strong>Predict Vehicle Volume</strong> to run the Machine Learning model.</p>
+                        </div>
+
+                        <!-- Error State Card -->
+                        <div id="predictionErrorState" class="alert-banner alert-danger" style="display: none;">
+                            <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="alert-content" id="predictionErrorMessage">
+                                Error running prediction.
+                            </div>
+                        </div>
+
+                        <!-- Results Container (Hidden until prediction runs) -->
+                        <div id="predictionResultCard" class="result-card-inner" style="display: none;">
+                            <!-- Output Metric Cards -->
+                            <div class="pred-summary-grid">
+                                <div class="pred-metric-box">
+                                    <span class="box-label">Predicted Volume</span>
+                                    <div class="box-value-large" id="resVolume">--</div>
+                                    <span class="box-unit">vehicles / hour</span>
+                                </div>
+
+                                <div class="pred-metric-box">
+                                    <span class="box-label">Congestion Classification</span>
+                                    <div class="congestion-badge-box" id="resCongestionBadge">
+                                        <span class="badge-dot"></span>
+                                        <span id="resCongestionText">--</span>
+                                    </div>
+                                    <span class="box-unit" id="resCongestionSub">Threshold based</span>
+                                </div>
+
+                                <div class="pred-metric-box">
+                                    <span class="box-label">Estimated Speed</span>
+                                    <div class="box-value-medium" id="resSpeed">--</div>
+                                    <span class="box-unit">km/h average</span>
+                                </div>
+                            </div>
+
+                            <!-- Visual Capacity Threshold Meter -->
+                            <div class="threshold-meter-container">
+                                <div class="meter-labels">
+                                    <span>0</span>
+                                    <span>Low (&lt;300)</span>
+                                    <span>Medium (300-700)</span>
+                                    <span>High (&gt;700)</span>
+                                    <span>1,200+</span>
+                                </div>
+                                <div class="meter-bar-track">
+                                    <div class="meter-bar-fill" id="meterFill" style="width: 0%;"></div>
+                                    <div class="meter-indicator-pointer" id="meterPointer" style="left: 0%;">
+                                        <div class="pointer-arrow"></div>
+                                        <span class="pointer-text" id="pointerText">0</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mini Chart comparing against road average -->
+                            <div class="pred-chart-container">
+                                <canvas id="chartPredictionBenchmark"></canvas>
+                            </div>
+
+                            <!-- Context Summary Chips -->
+                            <div class="context-chips">
+                                <span class="chip"><i class="fa-solid fa-road"></i> <span id="chipRoad">--</span></span>
+                                <span class="chip"><i class="fa-solid fa-calendar"></i> <span id="chipDate">--</span></span>
+                                <span class="chip"><i class="fa-solid fa-clock"></i> <span id="chipTime">--</span></span>
+                                <span class="chip"><i class="fa-solid fa-cloud"></i> <span id="chipWeather">--</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTTOM FULL SECTION: Autonomous AI Traffic Management Agent -->
+                <div class="section-block" id="agentSection" style="margin-top: 32px;">
+                    <div class="agent-panel">
+                        <div class="agent-panel-header">
+                            <div class="agent-brand">
+                                <div class="agent-icon"><i class="fa-solid fa-microchip"></i></div>
+                                <div>
+                                    <span class="agent-pill"><i class="fa-solid fa-sparkles"></i> AI Traffic Management Agent</span>
+                                    <h2>Autonomous Policy Recommendation Engine</h2>
+                                    <p>Translates quantitative vehicle volumes into tactical urban engineering directives.</p>
+                                </div>
+                            </div>
+                            <div class="agent-actions">
+                                <button type="button" class="btn btn-primary" id="btnRunAgent" onclick="triggerAIAgent()">
+                                    <i class="fa-solid fa-brain"></i> Generate Management Directives
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Agent State Container -->
+                        <div class="agent-body">
+                            <div id="agentInitialPrompt" class="agent-state-info">
+                                <i class="fa-solid fa-circle-question"></i>
+                                <span>Run a prediction above and click <strong>Generate Management Directives</strong> to synthesize signal timing, transit dispatch, and perimeter diversion strategies for the selected corridor.</span>
+                            </div>
+
+                            <div id="agentLoading" class="agent-state-loading" style="display: none;">
+                                <div class="loading-pulse"></div>
+                                <p>Synthesizing intelligent urban traffic management policies...</p>
+                                <span class="agent-sub-notice">Evaluating corridor capacity, monsoon contingencies, and mass transit alternatives</span>
+                            </div>
+
+                            <div id="agentOutputContainer" class="agent-output-content" style="display: none;">
+                                <div class="agent-source-tag" id="agentSourceTag">
+                                    <i class="fa-solid fa-shield-halved"></i> Source: Google Gemini 2.5 Flash Agent
+                                </div>
+                                <div class="agent-markdown" id="agentMarkdownOutput">
+                                    <!-- Dynamic agent directives will be inserted here -->
+                                </div>
+                                <div class="agent-disclaimer">
+                                    <i class="fa-solid fa-info-circle"></i>
+                                    <span>Academic Simulation Disclaimer: Suggestions are generated for educational analysis and do not directly control municipal signals or municipal operations.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <p>&copy; 2026 TrafficSense AI &bull; Fundamentals of Artificial Intelligence (FAI) Mini-Project &bull; Educational Prototype</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Set default date to today
+            const today = new Date().toISOString().split("T")[0];
+            const dateInput = document.getElementById("pred_date");
+            if (dateInput) {
+                dateInput.value = today;
+                updateDerivedDateLabels(today);
+                dateInput.addEventListener("change", function() {
+                    updateDerivedDateLabels(this.value);
+                });
+            }
+        });
+
+        function updateHourDisplay(val) {
+            const h = parseInt(val);
+            const period = h >= 12 ? "PM" : "AM";
+            const displayH = h % 12 === 0 ? 12 : h % 12;
+            document.getElementById("hourDisplay").textContent = `${String(h).padStart(2, '0')}:00 (${displayH}:00 ${period})`;
+        }
+
+        function setPresetHour(h) {
+            document.getElementById("pred_hour").value = h;
+            updateHourDisplay(h);
+        }
+
+        function updateDerivedDateLabels(dateStr) {
+            if (!dateStr) return;
+            const parts = dateStr.split("-");
+            if (parts.length === 3) {
+                const d = new Date(parts[0], parts[1] - 1, parts[2]);
+                const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const dayName = days[d.getDay()];
+                const isWknd = (d.getDay() === 0 || d.getDay() === 6);
+                
+                document.getElementById("tagDayOfWeek").textContent = `Day: ${dayName}`;
+                document.getElementById("tagIsWeekend").textContent = `Type: ${isWknd ? "Weekend" : "Weekday"}`;
+                document.getElementById("tagIsWeekend").className = isWknd ? "derived-tag tag-orange" : "derived-tag tag-blue";
+            }
+        }
+    </script>
+</body>
+</html>

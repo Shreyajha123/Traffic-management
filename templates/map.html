@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Bengaluru Traffic Map - TrafficSense AI</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet.js CSS & JS CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-traffic-light"></i>
+                </div>
+                <div class="brand-info">
+                    <h2>TrafficSense<span>AI</span></h2>
+                    <p>FAI Mini-Project</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/dashboard" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/predict" class="nav-item">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Predict & Agent</span>
+                </a>
+                <a href="/map" class="nav-item active">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Bengaluru Map</span>
+                </a>
+                <a href="/assistant" class="nav-item">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="/data" class="nav-item">
+                    <i class="fa-solid fa-database"></i>
+                    <span>Dataset & Report</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-indicator" id="model-status-indicator"></span>
+                        <span class="status-title" id="model-status-text">Checking System...</span>
+                    </div>
+                    <div class="status-sub" id="gemini-status-text">Gemini: Initializing</div>
+                </div>
+                <div class="academic-tag">
+                    <i class="fa-solid fa-graduation-cap"></i> Fundamentals of AI (FAI)
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span>Geospatial</span> <i class="fa-solid fa-angle-right"></i> <span class="active-crumb">Bengaluru Corridor Map</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <span class="badge badge-primary"><i class="fa-solid fa-satellite"></i> Leaflet + OpenStreetMap</span>
+                </div>
+            </header>
+
+            <!-- Page Body -->
+            <div class="content-container">
+                <!-- Academic Disclaimer Banner -->
+                <div class="alert-banner alert-warning">
+                    <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="alert-content">
+                        <strong>Demonstration Map Markers:</strong>
+                        The 8 junction markers displayed below represent academic demonstration congestion categories (Green = Low, Orange = Medium, Red = High).
+                        They do <strong>not</strong> represent live surveillance telemetry, actual Bengaluru Police traffic readings, or real-time vehicular counts.
+                    </div>
+                </div>
+
+                <!-- Page Header Title & Filters -->
+                <div class="map-controls-header">
+                    <div>
+                        <h1 class="page-title">Interactive Bengaluru Traffic Corridor Map</h1>
+                        <p class="page-subtitle">Geographic visualization of key Bengaluru intersections and bottleneck nodes.</p>
+                    </div>
+
+                    <div class="map-filter-group">
+                        <span class="filter-label">Filter Junctions:</span>
+                        <button class="map-filter-btn active" data-filter="all" onclick="filterMapMarkers('all', this)">All (8)</button>
+                        <button class="map-filter-btn filter-high" data-filter="High" onclick="filterMapMarkers('High', this)">
+                            <span class="badge-dot dot-red"></span> High Congestion
+                        </button>
+                        <button class="map-filter-btn filter-medium" data-filter="Medium" onclick="filterMapMarkers('Medium', this)">
+                            <span class="badge-dot dot-orange"></span> Medium Congestion
+                        </button>
+                        <button class="map-filter-btn filter-low" data-filter="Low" onclick="filterMapMarkers('Low', this)">
+                            <span class="badge-dot dot-green"></span> Low Congestion
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Leaflet Map Container -->
+                <div class="map-wrapper-card">
+                    <div id="bengaluruMap" class="leaflet-map-canvas"></div>
+
+                    <!-- Map Legend Overlay -->
+                    <div class="map-legend-overlay">
+                        <h4><i class="fa-solid fa-layer-group"></i> Demonstration Legend</h4>
+                        <div class="legend-item">
+                            <span class="legend-pin pin-red"></span>
+                            <div>
+                                <strong>High Congestion</strong>
+                                <span>Typical rush-hour bottleneck (&gt;700 veh/hr)</span>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-pin pin-orange"></span>
+                            <div>
+                                <strong>Medium Congestion</strong>
+                                <span>Moderate flow with queueing (300-700 veh/hr)</span>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-pin pin-green"></span>
+                            <div>
+                                <strong>Low Congestion</strong>
+                                <span>Free flow corridor (&lt;300 veh/hr)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Corridor Detail Cards Grid -->
+                <div class="section-block" style="margin-top: 32px;">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-list-check"></i> Key Bengaluru Junctions Catalog</h2>
+                        <p>Academic profile of surveyed transport corridors.</p>
+                    </div>
+                    <div class="grid-4" id="junctionCardsGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <p>&copy; 2026 TrafficSense AI &bull; Fundamentals of Artificial Intelligence (FAI) Mini-Project &bull; Educational Prototype</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/main.js"></script>
+    <script>
+        // Bengaluru Illustrative Junctions Data
+        const BENGALURU_JUNCTIONS = [
+            {
+                name: "Silk Board Junction",
+                lat: 12.9176,
+                lng: 77.6234,
+                congestion: "High",
+                description: "Critical interchange connecting Outer Ring Road, Hosur Road, and Koramangala. Frequent peak hour bottle-necking.",
+                advisory: "Recommend metro transit & Sarjapur diversion during 8:30-11:00 AM."
+            },
+            {
+                name: "KR Puram Hanging Bridge",
+                lat: 13.0006,
+                lng: 77.6766,
+                congestion: "High",
+                description: "Major bottleneck connecting Old Madras Road to Whitefield and ORR. Constrained carriageway width at railway overpass.",
+                advisory: "Promote Baiyappanahalli metro feeder buses."
+            },
+            {
+                name: "Hebbal Flyover Junction",
+                lat: 13.0358,
+                lng: 77.5970,
+                congestion: "High",
+                description: "Strategic junction converging Airport Road (NH 44), Bellary Road, and Outer Ring Road.",
+                advisory: "Signal cycle priority for northbound airport traffic."
+            },
+            {
+                name: "Marathahalli ORR Bridge",
+                lat: 12.9555,
+                lng: 77.6985,
+                congestion: "Medium",
+                description: "Key IT corridor node serving Bellandur and ITPL tech parks. Subject to weather-related waterlogging slows.",
+                advisory: "Maintain active drainage clearance and lane discipline."
+            },
+            {
+                name: "Electronic City Elevated Toll",
+                lat: 12.8452,
+                lng: 77.6602,
+                congestion: "Medium",
+                description: "Southern IT corridor toll gate. Peak inbound volume between 8:30-10:30 AM.",
+                advisory: "Dynamic toll lane allocation via FASTag automation."
+            },
+            {
+                name: "Whitefield ITPL Main Road",
+                lat: 12.9863,
+                lng: 77.7346,
+                congestion: "Medium",
+                description: "Major suburban tech hub arterial road with elevated Purple Line Metro infrastructure.",
+                advisory: "Encourage last-mile feeder shuttles from Kadugodi Metro."
+            },
+            {
+                name: "Indiranagar 100ft Road",
+                lat: 12.9719,
+                lng: 77.6412,
+                congestion: "Low",
+                description: "Vibrant commercial and dining boulevard. Steady flow during weekdays; weekend evening leisure surges.",
+                advisory: "Implement smart curbside parking management."
+            },
+            {
+                name: "MG Road Central CBD",
+                lat: 12.9753,
+                lng: 77.6094,
+                congestion: "Low",
+                description: "Central Business District corridor with integrated Purple Line Metro stations and regulated pedestrian crossings.",
+                advisory: "Coordinated green wave synchronization at 40 km/h."
+            }
+        ];
+
+        let mapInstance = null;
+        let mapMarkers = [];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            initBengaluruMap();
+            renderJunctionCards();
+        });
+
+        function initBengaluruMap() {
+            // Center of Bengaluru: ~12.9716° N, 77.5946° E
+            mapInstance = L.map('bengaluruMap').setView([12.9550, 77.6500], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(mapInstance);
+
+            addMarkersToMap("all");
+        }
+
+        function getColorForCongestion(level) {
+            switch(level) {
+                case "High": return "#ef4444";
+                case "Medium": return "#f59e0b";
+                case "Low": return "#10b981";
+                default: return "#3b82f6";
+            }
+        }
+
+        function addMarkersToMap(filter) {
+            // Clear existing markers
+            mapMarkers.forEach(m => mapInstance.removeLayer(m));
+            mapMarkers = [];
+
+            BENGALURU_JUNCTIONS.forEach(junc => {
+                if (filter !== "all" && junc.congestion !== filter) {
+                    return;
+                }
+
+                const color = getColorForCongestion(junc.congestion);
+
+                // Leaflet circleMarker for smooth, crisp circular pin
+                const marker = L.circleMarker([junc.lat, junc.lng], {
+                    radius: 10,
+                    fillColor: color,
+                    color: "#ffffff",
+                    weight: 2.5,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                });
+
+                const popupHtml = `
+                    <div class="map-popup-card">
+                        <div class="popup-header">
+                            <span class="popup-badge" style="background-color: ${color}20; color: ${color}; border: 1px solid ${color};">
+                                ${junc.congestion} Congestion
+                            </span>
+                            <h4>${junc.name}</h4>
+                        </div>
+                        <p class="popup-desc">${junc.description}</p>
+                        <div class="popup-advisory">
+                            <i class="fa-solid fa-lightbulb"></i> <strong>Advisory:</strong> ${junc.advisory}
+                        </div>
+                        <div class="popup-disclaimer">
+                            <i class="fa-solid fa-circle-exclamation"></i> Illustrative simulation marker (Not live surveillance)
+                        </div>
+                    </div>
+                `;
+
+                marker.bindPopup(popupHtml);
+                marker.addTo(mapInstance);
+                mapMarkers.push(marker);
+            });
+        }
+
+        function filterMapMarkers(filter, btn) {
+            document.querySelectorAll(".map-filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            addMarkersToMap(filter);
+        }
+
+        function renderJunctionCards() {
+            const container = document.getElementById("junctionCardsGrid");
+            if (!container) return;
+
+            container.innerHTML = BENGALURU_JUNCTIONS.map(j => {
+                const color = getColorForCongestion(j.congestion);
+                return `
+                    <div class="junction-card" onclick="panToJunction(${j.lat}, ${j.lng})">
+                        <div class="junc-header">
+                            <span class="junc-badge" style="background: ${color}20; color: ${color}; border-color: ${color};">
+                                ${j.congestion}
+                            </span>
+                            <h4>${j.name}</h4>
+                        </div>
+                        <p class="junc-desc">${j.description}</p>
+                        <div class="junc-action">
+                            <span><i class="fa-solid fa-location-crosshairs"></i> View on Map</span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function panToJunction(lat, lng) {
+            if (mapInstance) {
+                mapInstance.flyTo([lat, lng], 14, { duration: 1.2 });
+                // Find matching marker and open popup
+                mapMarkers.forEach(m => {
+                    const pos = m.getLatLng();
+                    if (Math.abs(pos.lat - lat) < 0.001 && Math.abs(pos.lng - lng) < 0.001) {
+                        m.openPopup();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

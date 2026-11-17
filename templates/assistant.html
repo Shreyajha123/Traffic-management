@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Traffic Assistant - TrafficSense AI</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Marked.js for parsing markdown in responses -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-traffic-light"></i>
+                </div>
+                <div class="brand-info">
+                    <h2>TrafficSense<span>AI</span></h2>
+                    <p>FAI Mini-Project</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/dashboard" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/predict" class="nav-item">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Predict & Agent</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Bengaluru Map</span>
+                </a>
+                <a href="/assistant" class="nav-item active">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="/data" class="nav-item">
+                    <i class="fa-solid fa-database"></i>
+                    <span>Dataset & Report</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-indicator" id="model-status-indicator"></span>
+                        <span class="status-title" id="model-status-text">Checking System...</span>
+                    </div>
+                    <div class="status-sub" id="gemini-status-text">Gemini: Initializing</div>
+                </div>
+                <div class="academic-tag">
+                    <i class="fa-solid fa-graduation-cap"></i> Fundamentals of AI (FAI)
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span>AI Assistant</span> <i class="fa-solid fa-angle-right"></i> <span class="active-crumb">Mobility Chatbot</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <span class="badge badge-primary" id="chatEngineBadge">
+                        <i class="fa-solid fa-sparkles"></i> Assistant Engine Active
+                    </span>
+                    <button class="btn btn-secondary btn-sm" onclick="clearChatHistory()">
+                        <i class="fa-solid fa-trash-can"></i> Clear Chat
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Body -->
+            <div class="content-container">
+                <!-- Academic Disclaimer Banner -->
+                <div class="alert-banner alert-info">
+                    <div class="alert-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="alert-content">
+                        <strong>Educational Mobility Assistant:</strong>
+                        Powered by Google Gemini 2.5 when configured in <code>.env</code>, or our built-in Educational Rule Engine when offline.
+                        All answers are educational analyses of urban traffic principles and do not constitute official police advisories.
+                    </div>
+                </div>
+
+                <div class="chat-layout-grid">
+                    <!-- LEFT/TOP: Chat Window -->
+                    <div class="chat-container-card">
+                        <div class="chat-header">
+                            <div class="assistant-avatar">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="assistant-meta">
+                                <h3>TrafficSense Mobility Consultant</h3>
+                                <p id="assistantEngineSub">Checking Gemini connection status...</p>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Viewport -->
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Welcome Message -->
+                            <div class="chat-bubble bot-bubble">
+                                <div class="bubble-avatar"><i class="fa-solid fa-robot"></i></div>
+                                <div class="bubble-body">
+                                    <div class="bubble-author">TrafficSense AI Assistant</div>
+                                    <div class="bubble-text">
+                                        <p>Hello! I am your <strong>TrafficSense AI</strong> educational assistant for the Fundamentals of Artificial Intelligence (FAI) project.</p>
+                                        <p>I can help you understand:</p>
+                                        <ul>
+                                            <li>Bengaluru corridor bottlenecks (Silk Board, KR Puram, Hebbal, etc.)</li>
+                                            <li>How Machine Learning (Random Forest) predicts vehicle volume</li>
+                                            <li>Weather and rush-hour impacts on traffic flow</li>
+                                            <li>AI-driven intelligent traffic management solutions</li>
+                                        </ul>
+                                        <p>Click any quick prompt on the right or type your question below!</p>
+                                    </div>
+                                    <div class="bubble-time">System Ready</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input Box -->
+                        <div class="chat-input-bar">
+                            <form id="chatForm" onsubmit="handleChatSubmit(event)">
+                                <div class="input-wrapper">
+                                    <textarea id="chatInput" class="chat-textarea" placeholder="Ask about Bengaluru traffic, congestion, or the ML model..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+                                    <button type="submit" class="btn btn-primary btn-icon" id="btnSendChat" aria-label="Send message">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            <div class="chat-footnote">
+                                <i class="fa-solid fa-shield-halved"></i> API keys are strictly kept on the backend; never exposed to browser.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT/SIDEBAR: Suggested Prompts & Knowledge Base -->
+                    <div class="chat-sidebar-card">
+                        <div class="side-panel-header">
+                            <h3><i class="fa-solid fa-lightbulb"></i> Recommended Questions</h3>
+                            <p>Click any topic to test the AI Assistant:</p>
+                        </div>
+
+                        <div class="prompt-chips-list">
+                            <button class="prompt-chip" onclick="askPreset('How can traffic congestion be reduced at MG Road?')">
+                                <div class="chip-icon"><i class="fa-solid fa-arrow-right"></i></div>
+                                <span>How can traffic congestion be reduced at MG Road?</span>
+                            </button>
+
+                            <button class="prompt-chip" onclick="askPreset('What causes the severe bottleneck at Silk Board Junction?')">
+                                <div class="chip-icon"><i class="fa-solid fa-arrow-right"></i></div>
+                                <span>What causes the severe bottleneck at Silk Board Junction?</span>
+                            </button>
+
+                            <button class="prompt-chip" onclick="askPreset('How does rainy weather affect urban vehicle speed in Bengaluru?')">
+                                <div class="chip-icon"><i class="fa-solid fa-arrow-right"></i></div>
+                                <span>How does rainy weather affect urban vehicle speed in Bengaluru?</span>
+                            </button>
+
+                            <button class="prompt-chip" onclick="askPreset('Explain how the Random Forest model predicts vehicle counts.')">
+                                <div class="chip-icon"><i class="fa-solid fa-arrow-right"></i></div>
+                                <span>Explain how the Random Forest model predicts vehicle counts.</span>
+                            </button>
+
+                            <button class="prompt-chip" onclick="askPreset('What is the difference between Low, Medium, and High congestion in this project?')">
+                                <div class="chip-icon"><i class="fa-solid fa-arrow-right"></i></div>
+                                <span>What is the difference between Low, Medium, and High congestion?</span>
+                            </button>
+                        </div>
+
+                        <div class="api-status-info-box">
+                            <h4><i class="fa-solid fa-key"></i> Gemini API Status</h4>
+                            <p id="geminiSetupGuide">
+                                If you have an API key, add it to <code>.env</code> as <code>GEMINI_API_KEY=your_key</code> to enable live Gemini 2.5 Flash responses.
+                                Without a key, our academic knowledge engine provides structured demo answers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <p>&copy; 2026 TrafficSense AI &bull; Fundamentals of Artificial Intelligence (FAI) Mini-Project &bull; Educational Prototype</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/main.js"></script>
+    <script>
+        function askPreset(text) {
+            const input = document.getElementById("chatInput");
+            if (input) {
+                input.value = text;
+                document.getElementById("chatForm").dispatchEvent(new Event("submit"));
+            }
+        }
+
+        function handleChatKeydown(e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById("chatForm").dispatchEvent(new Event("submit"));
+            }
+        }
+    </script>
+</body>
+</html>
